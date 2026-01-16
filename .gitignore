@@ -1,3 +1,3 @@
 data_raw/**/*.XPT
 data_raw/**/*.zip
-data_processed/BRFSS_2015_2024.csv
+data_processed/*.csv
