@@ -1,7 +1,766 @@
 # AI Copilot Instructions for BRFSS Diabetes Trends
 
+**Document Version**: 1.1  
+**Last Updated**: January 2026  
+**Audience**: AI Assistants, Developers, Contributors
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Architecture & Data Flow](#architecture--data-flow)
+3. [Critical Patterns & Conventions](#critical-patterns--conventions)
+4. [Common Tasks & Workflows](#common-tasks--workflows)
+5. [Debugging Guide](#debugging-guide)
+6. [Configuration Reference](#configuration-reference)
+7. [Key Function Signatures](#key-function-signatures)
+8. [Performance & Optimization](#performance--optimization)
+9. [Guidelines for AI Agents](#guidelines-for-ai-agents)
+
+---
+
 ## Project Overview
-This repository processes Behavioral Risk Factor Surveillance System (BRFSS) data from 2015–2024 to analyze diabetes trends. The core workflow is a single Jupyter notebook (`analysis/1_data_download.ipynb`) that downloads raw XPT files from CDC, harmonizes variables across years, decodes numeric codes to human-readable labels, and exports a unified CSV.
+
+This repository processes Behavioral Risk Factor Surveillance System (BRFSS) data spanning 2015–2024 to analyze diabetes trends and related health indicators. The core workflow is a single, comprehensive Jupyter notebook (`analysis/1_data_download.ipynb`) that:
+
+1. **Downloads** raw XPT files from the CDC with intelligent caching
+2. **Harmonizes** variables across years despite schema drift
+3. **Normalizes** inconsistent coding schemes (e.g., day-count fields)
+4. **Decodes** numeric values to human-readable labels
+5. **Exports** a unified CSV dataset for analysis
+
+### Scope & Constraints
+
+- **Data Years**: 2015–2024 (10 years of continuous data)
+- **File Format**: SAS Transport (.XPT) format from CDC
+- **Output**: Single CSV file (`BRFSS_2015_2024_HARMONIZED_DECODED.csv`) with 24 columns
+- **Memory Constraint**: ~500 MB – 1 GB per year (sequential processing required)
+- **Processing Time**: ~30–60 minutes for full pipeline
+
+---
+
+## Architecture & Data Flow
+
+### Input Sources
+
+| Source | Format | Location | Purpose |
+|--------|--------|----------|---------|
+| CDC BRFSS Data | SAS XPT | `https://www.cdc.gov/brfss/annual_data/{year}/files/LLCP{year}XPT.zip` | Raw survey responses |
+| Codebooks | HTML | `data_codebooks/` | Variable names and code mappings |
+| Config Files | JSON | `config/*.json` | Variable mappings and transformations |
+
+### Processing Pipeline (Notebook Cells)
+
+```
+1. [Load Configuration]
+   └─ Load VAR_MAP.json, VALUE_TEXT_MAP.json, VALUE_MAP.json
+   └─ Verify all config files valid JSON and contain required keys
+
+2. [Ensure XPT Files Exist]
+   ├─ ensure_xpt(year) for each year 2015–2024
+   ├─ Download from CDC if missing (with exponential backoff)
+   └─ Cache locally in data_raw/{year}/LLCP{year}.XPT
+
+3. [Process Each Year Sequentially]
+   ├─ load_year(year)
+   │  ├─ Read XPT file using pd.read_sas()
+   │  ├─ Validate required columns exist via VAR_MAP
+   │  ├─ Rename columns to canonical names
+   │  ├─ Normalize day-count fields (2015 only)
+   │  └─ Return DataFrame with canonical columns + YEAR
+   │
+   └─ load_multi_year()
+      ├─ Loop: for each year in [2015, ..., 2024]
+      ├─ Call load_year(year)
+      ├─ Decode numeric codes to labels via VALUE_TEXT_MAP
+      ├─ Append to CSV file (mode="a" except first year mode="w")
+      ├─ Delete df_year and gc.collect() to free memory
+      └─ Return path to final CSV
+
+4. [Validation]
+   ├─ Verify output CSV shape matches logged row counts
+   ├─ Check all 24 columns present (23 canonical + YEAR)
+   └─ Validate year distribution and data types
+```
+
+### Output
+
+- **Primary**: `data_processed/BRFSS_2015_2024_HARMONIZED_DECODED.csv`
+- **Size**: ~2–3 GB (typically 4+ million rows)
+- **Encoding**: UTF-8 with comma delimiters
+- **Schema**: 24 columns (see [Data Schema](#data-schema) in README)
+
+---
+
+## Critical Patterns & Conventions
+
+### 1. Variable Mapping Strategy
+
+A two-tier mapping system handles year-to-year schema drift:
+
+#### VAR_MAP: Canonical → Raw Column Names
+
+Maps canonical variable names (e.g., `HEALTH_STATUS`) to year-specific raw XPT column names (e.g., `_RFHLTH`).
+
+**Structure**:
+```json
+{
+  "CANONICAL_NAME": {
+    "2015": "RAW_COL_2015",
+    "2016": "RAW_COL_2016",
+    ...
+    "2024": "RAW_COL_2024"
+  }
+}
+```
+
+**Key Points**:
+- All years (2015–2024) are required keys
+- Some variables stable across years (e.g., `_RFHLTH` for `HEALTH_STATUS`)
+- Some variables change names year-to-year (e.g., `INCOME`: `_INCOMG` → `_INCOMG1` in 2021)
+- Value should be `null` if variable didn't exist in a particular year
+
+**Example: INCOME Schema Drift**
+```json
+"INCOME": {
+  "2015": "_INCOMG",   // 5 income categories
+  "2016": "_INCOMG",
+  "2017": "_INCOMG",
+  "2018": "_INCOMG",
+  "2019": "_INCOMG",
+  "2020": "_INCOMG",
+  "2021": "_INCOMG1",  // Schema changed to 7 categories
+  "2022": "_INCOMG1",
+  "2023": "_INCOMG1",
+  "2024": "_INCOMG1"
+}
+```
+
+#### VALUE_TEXT_MAP: Universal Code Mappings
+
+Constant mappings from numeric codes to human-readable labels. Used as the default for all years.
+
+**Structure**:
+```json
+{
+  "CANONICAL_NAME": {
+    "1": "Label for code 1",
+    "2": "Label for code 2",
+    "9": "Refused"
+  }
+}
+```
+
+**Convention**:
+- Code `9` typically means "Refused"
+- Code `7` typically means "Not sure" or "Uncertain"
+- Codes are strings in JSON but cast to integers during load
+
+**Example: DIABETES Codes**
+```json
+"DIABETES": {
+  "1": "Diabetes",
+  "2": "Gestational",
+  "3": "No",
+  "4": "PreDiabetes",
+  "7": "Not sure",
+  "9": "Refused"
+}
+```
+
+#### VALUE_MAP: Per-Year Code Overrides (Rare)
+
+Used when a specific year's codes differ significantly from the universal mapping.
+
+**Structure**:
+```json
+{
+  "FIELD_NAME": {
+    "YEAR": {
+      "1": "Label for this year's code 1",
+      "2": "Label for this year's code 2"
+    }
+  }
+}
+```
+
+**Decoding Priority**:
+1. Check `VALUE_MAP[canonical][year]` if exists
+2. Otherwise fall back to `VALUE_TEXT_MAP[canonical]`
+
+**Example: SEX in 2018 with Extra Code**
+```json
+"SEX": {
+  "2018": {
+    "1": "Male",
+    "2": "Female",
+    "7": "Not Sure",  // 2018-specific code
+    "9": "Refused"
+  }
+  // Other years use VALUE_TEXT_MAP["SEX"]
+}
+```
+
+### 2. Normalization Rules
+
+**Day-Count Fields** have inconsistent coding across years:
+
+| Field | Applies To |
+|-------|-----------|
+| `PHYSICAL_HEALTH_STATUS` | Days physical health not good (past 30 days) |
+| `MENTAL_HEALTH_STATUS` | Days mental health not good (past 30 days) |
+
+**Coding Differences**:
+
+| Year | Coding | Example Values |
+|------|--------|-----------------|
+| **2015** | Raw day counts | `0`, `1`, `15`, `31`, `88` (zero), `99` (refused) |
+| **2016+** | Categorical | `1` (zero), `2` (1–13 days), `3` (14+ days), `9` (refused) |
+
+**Normalization Logic** (in `normalize_days()` function):
+
+```
+Input (2015): 0–31 → Output (2016+): 1 (zero)
+Input (2015): 1–13 → Output (2016+): 2 (1–13 days)
+Input (2015): 14–31 → Output (2016+): 3 (14+ days)
+Input (2015): 88 → Output (2016+): 1 (zero days)
+Input (2015): 99 → Output (2016+): 9 (refused)
+```
+
+**Critical**: Always normalize 2015 data to 2016 format before decoding to ensure cross-year comparisons are valid.
+
+### 3. Memory Management
+
+The notebook processes multiple years while maintaining low memory footprint:
+
+**Strategy: Sequential Processing with Explicit Cleanup**
+
+```python
+for year in YEARS:
+    df_year = load_year(year)           # ~500 MB–1 GB
+    df_year_decoded = decode(df_year)   # Transform in-place or create new
+    df_year_decoded.to_csv(output_path, mode="a", header=(year==first_year))
+    
+    del df_year                         # Explicit deletion
+    del df_year_decoded
+    gc.collect()                        # Force garbage collection
+    # Memory now released; ready for next year
+```
+
+**Key Points**:
+- Never materialize all years in memory simultaneously
+- Use CSV `mode="a"` (append) to avoid re-reading previous data
+- Call `gc.collect()` after each year's write
+- Track memory deltas in logs (`_get_memory_bytes()` function)
+- Prefer `psutil.Process().memory_info().rss` if available (accurate)
+- Fall back to `tracemalloc` if psutil not installed
+
+### 4. Error Handling & Resilience
+
+| Error Type | Handling | Outcome |
+|------------|----------|---------|
+| Download fails | Exponential backoff: 1s, 2s, 4s delays (max 3 retries) | Retry or raise RuntimeError |
+| ZIP is corrupted | Check magic bytes and attempt re-download | RuntimeError if repeated |
+| XPT read fails | Log error, return empty DataFrame | Year skipped gracefully |
+| Missing columns | Log warning, add as NA via `reindex()` | Data quality impacted but process continues |
+| Decoding fails | Log per-column, preserve original value | Some fields remain numeric |
+
+**Design Philosophy**: Fail gracefully rather than halt. Log all errors for post-run investigation.
+
+---
+
+## Common Tasks & Workflows
+
+### Adding a New Variable
+
+**Goal**: Include a new health variable in the output dataset.
+
+**Steps**:
+
+1. **Find Raw Column Names** in CDC codebooks (`data_codebooks/`):
+   - Search HTML files for variable concept (e.g., "diabetes", "physical activity")
+   - Locate raw column name (e.g., `_DIABETE4`, `_CHCVDIS1`)
+   - Note any year-to-year changes in variable names or codes
+
+2. **Update `VAR_MAP.json`**:
+   ```json
+   {
+     "NEW_VARIABLE": {
+       "2015": "RAW_COL_2015",
+       "2016": "RAW_COL_2016",
+       ...
+       "2024": "RAW_COL_2024"
+     }
+   }
+   ```
+   - All 10 years are required
+   - Use `null` if variable didn't exist in a year
+
+3. **Update `VALUE_TEXT_MAP.json`**:
+   ```json
+   {
+     "NEW_VARIABLE": {
+       "1": "Yes",
+       "2": "No",
+       "7": "Not sure",
+       "9": "Refused"
+     }
+   }
+   ```
+   - Include all possible numeric codes
+   - Use standardized labels (e.g., "Refused", "Not sure")
+
+4. **Optional: Add Per-Year Overrides** to `VALUE_MAP.json` if coding differs:
+   ```json
+   {
+     "NEW_VARIABLE": {
+       "2018": {
+         "1": "Yes",
+         "2": "No",
+         "7": "Maybe",
+         "9": "Refused"
+       }
+     }
+   }
+   ```
+
+5. **Optional: Add Normalization** if variable requires special handling (like day-count fields):
+   - Create a normalization function in `load_year()`
+   - Apply before column rename to canonical name
+   - Document normalization logic in notebook comments
+
+6. **Test with Single Year**:
+   ```python
+   df_test = load_year(2020)
+   print(df_test[['NEW_VARIABLE']].value_counts(dropna=False))
+   # Verify output has human-readable labels
+   ```
+
+7. **Run Full Pipeline**:
+   ```python
+   load_multi_year(output_path="data_processed/BRFSS_2015_2024_HARMONIZED_DECODED.csv")
+   ```
+
+**Example: Adding DIET_FRUIT (hypothetical)**
+
+Codebook shows: `_FRUTSUM` in 2016+, `FRUITJUC` in 2015 with codes 1=Daily, 2=Not daily, 9=Refused
+
+1. **VAR_MAP entry**:
+   ```json
+   "DIET_FRUIT": {
+     "2015": "FRUITJUC",
+     "2016": "_FRUTSUM",
+     ...
+     "2024": "_FRUTSUM"
+   }
+   ```
+
+2. **VALUE_TEXT_MAP entry**:
+   ```json
+   "DIET_FRUIT": {
+     "1": "Daily",
+     "2": "Not daily",
+     "9": "Refused"
+   }
+   ```
+
+3. **Test** to confirm decoding works for all years
+
+### Extending the Processing Pipeline
+
+**Goal**: Add custom transformations or validations.
+
+**Design Principle**: Use configuration-driven approach. Avoid hardcoded year conditionals.
+
+**Bad (Hardcoded)**:
+```python
+if year == 2021:
+    df['INCOME'] = df['_INCOMG1']  # ❌ Don't do this
+else:
+    df['INCOME'] = df['_INCOMG']
+```
+
+**Good (Configuration-Driven)**:
+```python
+# In VAR_MAP.json:
+"INCOME": {
+  "2020": "_INCOMG",
+  "2021": "_INCOMG1"
+}
+
+# In load_year():
+raw_col = VAR_MAP[canonical][year]
+df[canonical] = df[raw_col]
+```
+
+**Where to Add Logic**:
+- **Mappings**: Add to `VAR_MAP`, `VALUE_TEXT_MAP`, `VALUE_MAP` (JSON config files)
+- **Per-Year Transformations**: Add to `load_year()` function (e.g., normalization)
+- **Per-Year Decoding**: Add to `VALUE_MAP` (per-year code overrides)
+- **Validation**: Add to `validate_year_mappings()` function
+
+### Validating Output CSV
+
+**Goal**: Confirm data quality after `load_multi_year()` completes.
+
+**Quick Validation Script**:
+```python
+import pandas as pd
+
+df = pd.read_csv("data_processed/BRFSS_2015_2024_HARMONIZED_DECODED.csv")
+
+# 1. Shape & Structure
+print(f"Shape: {df.shape}")  # Expected: (~4M rows, 24 columns)
+print(f"Columns: {list(df.columns)}")
+
+# 2. Year Distribution
+print(f"\nRows per year:")
+print(df.groupby('YEAR').size())
+
+# 3. Data Types
+print(f"\nData types:")
+print(df.dtypes)
+
+# 4. Missing Values
+print(f"\nMissing values per column:")
+print(df.isna().sum())
+
+# 5. Decoded Values (spot check)
+print(f"\nSample decoded data:")
+print(df[['DIABETES', 'HEALTH_STATUS', 'YEAR']].head(10))
+
+# 6. Value Uniqueness
+print(f"\nUnique values (sample):")
+for col in ['DIABETES', 'HEALTH_STATUS', 'SMOKER']:
+    print(f"  {col}: {df[col].unique()}")
+```
+
+**Validation Checklist**:
+- [ ] Shape matches total rows logged in `[WROTE]` lines
+- [ ] 24 columns present (23 canonical + YEAR)
+- [ ] Year distribution: ~350k–500k rows per year
+- [ ] All canonical columns are object/string type (decoded)
+- [ ] YEAR column is integer type
+- [ ] Missing values are rare (expected < 1% per column)
+- [ ] Sample values are human-readable (e.g., "Diabetes", "Yes", "Good")
+- [ ] No numeric codes remain in decoded columns
+
+---
+
+## Debugging Guide
+
+### Issue: Column Not Found in Raw XPT
+
+**Symptoms**: `KeyError: 'RAW_COL_NAME'` or missing columns in output
+
+**Diagnosis**:
+```python
+# 1. Check VAR_MAP configuration
+from config import VAR_MAP
+print(VAR_MAP.get('CANONICAL_NAME', {}).get(2020))  # Should return raw column name
+
+# 2. Inspect actual raw XPT columns
+df_raw = pd.read_sas("data_raw/2020/LLCP2020.XPT")
+print(df_raw.columns.tolist())
+
+# 3. Cross-reference codebook HTML
+# Search: LLCP 2019_ Codebook Report.html for variable names
+
+# 4. Verify VAR_MAP entry
+# Ensure key matches year and value matches actual column name (case-sensitive)
+```
+
+**Solution**:
+1. Search CDC codebook for correct raw column name
+2. Update `VAR_MAP.json` with correct name for affected years
+3. Re-run `load_year()` to verify fix
+
+### Issue: Unexpected NAs in Output CSV
+
+**Symptoms**: Missing values where data should exist
+
+**Diagnosis**:
+```python
+# 1. Check raw vs. normalized data
+df_raw = pd.read_sas("data_raw/2020/LLCP2020.XPT")
+print(f"Raw column NAs: {df_raw['_RFHLTH'].isna().sum()}")
+
+# 2. Check after mapping
+df_year = load_year(2020)
+print(f"Canonical column NAs: {df_year['HEALTH_STATUS'].isna().sum()}")
+
+# 3. Check distribution before decoding
+print(df_year['HEALTH_STATUS'].value_counts(dropna=False))
+
+# 4. Verify VALUE_TEXT_MAP has all codes
+print(VALUE_TEXT_MAP.get('HEALTH_STATUS'))
+```
+
+**Common Causes**:
+- Missing codes in `VALUE_TEXT_MAP` → Add missing code mappings
+- Normalization error (day-count fields) → Review `normalize_days()` logic
+- Column mapping error → Verify `VAR_MAP` entry
+- Data actually missing → Expected behavior (log and continue)
+
+### Issue: Memory Spike During Multi-Year Run
+
+**Symptoms**: Process slows or crashes during `load_multi_year()`
+
+**Diagnosis**:
+```python
+# Monitor memory in notebook:
+# Run with smaller year range first
+YEARS = [2020, 2021, 2022]
+load_multi_year(...)
+
+# Check log output for memory deltas
+# Look for: "[MEMORY] Before: X MB, After: Y MB, Delta: Z MB"
+```
+
+**Solutions**:
+1. Verify `del df_year; gc.collect()` called after each year
+2. Check for DataFrame copies in `load_year()` (use inplace operations)
+3. Profile with memory_profiler:
+   ```bash
+   pip install memory-profiler
+   python -m memory_profiler analysis/1_data_download.ipynb
+   ```
+4. Reduce processing batch or add intermediate cleanup
+
+### Issue: CSV Rows Mismatch (Fewer Rows Than Expected)
+
+**Symptoms**: Final CSV has significantly fewer rows than raw XPT total
+
+**Diagnosis**:
+```python
+# Count raw rows
+df_raw = pd.read_sas("data_raw/2020/LLCP2020.XPT")
+print(f"Raw XPT rows: {len(df_raw):,}")
+
+# Count in processed CSV
+df_csv = pd.read_csv("data_processed/BRFSS_2015_2024_HARMONIZED_DECODED.csv")
+print(f"Processed CSV rows: {len(df_csv[df_csv['YEAR']==2020]):,}")
+
+# Check for early `continue` statements
+# Search notebook for: if len(df) == 0: continue
+```
+
+**Common Causes**:
+- Years skipped due to read failures → Check logs for `Failed to read SAS XPT`
+- Rows dropped during `reindex()` → Should only add columns, not remove rows
+- Rows deleted during normalization → Review `normalize_days()` logic
+- Write failures mid-pipeline → Check disk space and permissions
+
+---
+
+## Configuration Reference
+
+### VAR_MAP.json Structure
+
+```json
+{
+  "CANONICAL_NAME_1": {
+    "2015": "RAW_COL_A",
+    "2016": "RAW_COL_A",
+    "2017": "RAW_COL_A",
+    "2018": "RAW_COL_B",  // Changed names
+    "2019": "RAW_COL_B",
+    "2020": "RAW_COL_B",
+    "2021": "RAW_COL_C",  // Changed again
+    "2022": "RAW_COL_C",
+    "2023": "RAW_COL_C",
+    "2024": "RAW_COL_C"
+  },
+  "CANONICAL_NAME_2": { ... }
+}
+```
+
+**Requirements**:
+- All 10 years (2015–2024) must be present as keys
+- Values are exact raw column names from XPT files
+- Use `null` if variable missing in a year (not empty string)
+
+### VALUE_TEXT_MAP.json Structure
+
+```json
+{
+  "CANONICAL_NAME_1": {
+    "1": "First option",
+    "2": "Second option",
+    "9": "Refused"
+  },
+  "CANONICAL_NAME_2": { ... }
+}
+```
+
+**Requirements**:
+- Keys are numeric codes as strings (will be cast to int)
+- Values are human-readable labels
+- Include all possible codes across all years
+- Use consistent labels across years (except in VALUE_MAP overrides)
+
+### VALUE_MAP.json Structure (Optional)
+
+```json
+{
+  "CANONICAL_NAME": {
+    "2018": {
+      "1": "Year-specific label 1",
+      "2": "Year-specific label 2"
+    }
+    // Other years use VALUE_TEXT_MAP
+  }
+}
+```
+
+**Use When**: A single year has different encoding than other years
+
+---
+
+## Key Function Signatures
+
+### Core Pipeline Functions
+
+#### `ensure_xpt(year: int, retries: int = 3, timeout: int = 30) → str`
+
+Downloads and caches CDC XPT file for a specific year.
+
+**Behavior**:
+- Returns local path if file already exists (idempotent)
+- Downloads ZIP from CDC if missing
+- Extracts .XPT file and moves to `data_raw/{year}/LLCP{year}.XPT`
+- Retries with exponential backoff (2^attempt seconds)
+
+**Returns**: Full file path to cached XPT file
+
+**Raises**:
+- `RuntimeError`: ZIP archive doesn't contain .xpt files
+- `requests.exceptions.RequestException`: Download fails after retries
+
+#### `load_year(year: int) → pd.DataFrame`
+
+Loads, processes, and harmonizes data for a single year.
+
+**Process**:
+1. Ensure XPT file cached via `ensure_xpt(year)`
+2. Read XPT using `pd.read_sas()`
+3. Validate expected columns exist (via `VAR_MAP`)
+4. Rename columns to canonical names
+5. Normalize special fields (e.g., day-count fields for 2015)
+6. Add YEAR column
+7. Return DataFrame with canonical columns
+
+**Returns**: DataFrame with canonical columns + YEAR, or empty DataFrame on error
+
+**Shape**: (num_respondents, 24) where columns are canonical names + YEAR
+
+#### `load_multi_year(output_path: str = "...") → str`
+
+Main pipeline function. Processes all years sequentially and writes to CSV.
+
+**Process**:
+```
+for year in [2015, ..., 2024]:
+    df_year = load_year(year)
+    decode_values(df_year)
+    df_year.to_csv(output_path, mode="a" or "w", header=first_year)
+    del df_year; gc.collect()
+```
+
+**Returns**: Full path to output CSV file
+
+**Side Effects**:
+- Creates `data_processed/BRFSS_2015_2024_HARMONIZED_DECODED.csv`
+- Logs progress and memory usage
+- Caches XPT files in `data_raw/{year}/`
+
+#### `validate_year_mappings(df_raw: pd.DataFrame, year: int) → list`
+
+Validates that all canonical columns can be found in raw XPT.
+
+**Returns**: List of missing canonical column names (empty if all valid)
+
+**Side Effects**: Logs summary to stdout
+
+#### `normalize_days(series: pd.Series) → pd.Series`
+
+Converts 2015 raw day-count values to 2016+ categorical format.
+
+**Input**: Values like 0–31, 88 (zero), 99 (refused)
+
+**Output**: Values mapped to 1 (zero), 2 (1–13 days), 3 (14+ days), 9 (refused)
+
+**Used On**:
+- `PHYSICAL_HEALTH_STATUS`
+- `MENTAL_HEALTH_STATUS`
+
+---
+
+## Performance & Optimization
+
+### Benchmarks (Typical System: 8 GB RAM, SSD)
+
+| Operation | Duration | RAM Usage |
+|-----------|----------|-----------|
+| Download all years (first run) | 20–40 min | <100 MB |
+| Process single year (2020) | 2–3 min | 600–800 MB |
+| Full multi-year pipeline | 25–45 min | 600–900 MB (per year) |
+
+### Optimization Tips
+
+1. **Skip Downloads**: Manually download years from CDC once, then set `retries=0`
+2. **Parallel Processing**: Modify to process non-dependent tasks in parallel (with caution)
+3. **Subset Years**: Test on small year ranges (e.g., `YEARS = [2020, 2021]`)
+4. **Use SSD**: CSV writes are faster on solid-state drives
+5. **Pre-allocate Memory**: Estimate RAM needs; add swap if necessary
+
+### Bottlenecks
+
+| Bottleneck | Impact | Solution |
+|-----------|--------|----------|
+| XPT read (`pd.read_sas`) | I/O bound (slow network) | Cache locally (via `ensure_xpt`) |
+| CSV write (`to_csv`) | I/O bound (slow disk) | Use SSD or increase write buffer |
+| Decoding loop | CPU bound | Vectorize if possible (reduce Python loops) |
+| Memory fragmentation | Memory leak risk | Call `gc.collect()` explicitly per year |
+
+---
+
+## Guidelines for AI Agents
+
+### DO ✅
+
+- **Use configuration files** for all mappings (VAR_MAP, VALUE_TEXT_MAP, VALUE_MAP)
+- **Respect the processing order**: read → validate → map → normalize → decode → write
+- **Test changes** on single year (`load_year(2020)`) before full pipeline
+- **Preserve missing values** as `pd.NA`; never drop rows for missing codes
+- **Log errors** with context (year, column, raw value) before continuing
+- **Memory is a constraint**: Stream years sequentially, delete explicitly, gc.collect()
+
+### DON'T ❌
+
+- **Hardcode column names or mappings** in function logic
+- **Use year conditionals** outside config (e.g., `if year == 2021`)
+- **Materialize all years** in memory simultaneously
+- **Drop rows** with missing/invalid codes; preserve and log
+- **Skip gc.collect()** calls after CSV writes
+- **Modify raw data** in place; always copy or be explicit about mutations
+
+### When Adding Features
+
+1. Check if feature requires year-specific handling
+2. If yes → Add to configuration JSON file
+3. If no → Add to core function logic (with tests)
+4. Always test on subset before full pipeline
+5. Update documentation (this file + README)
+
+### When Debugging
+
+1. Check logs first (look for errors, warnings, deltas)
+2. Isolate to specific year via `load_year(year)`
+3. Inspect intermediate DataFrames (shape, dtypes, nulls)
+4. Cross-reference codebook documentation
+5. Verify configuration (JSON syntax, required keys)
+
+
 
 ## Architecture & Data Flow
 
