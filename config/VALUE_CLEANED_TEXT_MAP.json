@@ -1,0 +1,22 @@
+{
+  "HEALTH_STATUS": {"0": "Poor", "1": "Good"},
+  "PHYSICAL_HEALTH_STATUS": {"0": "Zero days", "1": "1-13 days", "2": "14+ days"},
+  "MENTAL_HEALTH_STATUS": {"0": "Zero days", "1": "1-13 days", "2": "14+ days"},
+  "EXERCISE": {"0": "No", "1": "Yes"},
+  "HEALTH_CARE_COVERAGE": {"0": "No", "1": "Yes"},
+  "SMOKER": {"0": "No", "1": "Yes"},
+  "DRINKER": {"0": "No", "1": "Yes"},
+  "SOCIAL_DRINKER": {"0": "No", "1": "Yes"},
+  "HEAVY_ALCOHOL_CONSUMPTION": {"0": "No", "1": "Yes"},
+  "HEART_ATTACK": {"0": "No", "1": "Yes"},
+  "STROKE": {"0": "No", "1": "Yes"},
+  "DIABETES": {"0": "No", "1": "Yes"},
+  "ARTHRITIS": {"0": "No", "1": "Yes"},
+  "MARITAL_STATUS": {"1": "Married", "2": "Divorced", "3": "Widowed", "4": "Separated", "5": "Single", "6": "Partner"},
+  "EMPLOYMENT": {"1": "Wages", "2": "Self-Employed", "3": "Unemployed > 1 year", "4": "Unemployed < 1 year", "5": "Homemaker", "6": "Student", "7": "Retired", "8": "Unable to work"},
+  "SEX": {"0": "Female", "1": "Male"},
+  "AGE_CATEGORIES": {"1": "18-24", "2": "25-29", "3": "30-34", "4": "35-39", "5": "40-44", "6": "45-49", "7": "50-54", "8": "55-59", "9": "60-64", "10": "65-69", "11": "70-74", "12": "75-79", "13": "80+", "14": "Refused"},
+  "BMICAT": {"1": "Underweight", "2": "Normal", "3": "Overweight", "4": "Obese"},
+  "EDUCATION_LEVEL": {"1": "Dropout", "2": "High School Graduate", "3": "Undergraduate", "4": "Graduate", "9": "Not sure"},
+  "INCOME": {"1": "< $15000", "2": "$15000 - $25000", "3": "$25000 - $35000", "4": "$35000 - $50000", "5": "> $50000", "9": "Not sure"}
+}
