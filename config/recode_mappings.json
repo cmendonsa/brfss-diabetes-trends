@@ -1,37 +1,46 @@
 {
-  "EXERCISE": {
-    "old_values": ["1", "2"],
+  "DIABETES": {
+    "multi_step": true,
+    "no_codes": ["3", "4"],
+    "yes_codes": ["1", "2"]
+  },
+  "AGE_CATEGORIES": {
+    "old_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
+    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+  },
+  "SEX": {
+    "old_values": ["2", "1"],
     "new_values": ["0", "1"]
+  },
+  "RACE": {
+    "old_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    "new_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  },
+  "INCOME": {
+    "old_values": ["1", "2", "3", "4", "5"],
+    "new_values": ["0", "1", "2", "3", "4"]
+  },
+  "EDUCATION_LEVEL": {
+    "old_values": ["1", "2", "3", "4"],
+    "new_values": ["0", "1", "2", "3"]
+  },
+  "EMPLOYMENT": {
+    "old_values": ["3", "4", "8", "5", "6", "7", "2", "1"],
+    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7"]
+  },
+  "MARITAL_STATUS": {
+    "old_values": ["5", "4", "2", "3", "6", "1"],
+    "new_values": ["0", "1", "2", "3", "4", "5"]
   },
   "HEALTH_CARE_COVERAGE": {
     "old_values": ["1", "2"],
     "new_values": ["0", "1"]
   },
+  "BMICAT": {
+    "old_values": ["1", "2", "3", "4"],
+    "new_values": ["0", "1", "2", "3"]
+  },
   "HEART_ATTACK": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
-  },
-  "ARTHRITIS": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
-  },
-  "HEALTH_STATUS": {
-    "old_values": ["2", "1"],
-    "new_values": ["0", "1"]
-  },
-  "PHYSICAL_HEALTH_STATUS": {
-    "old_values": ["1", "2", "3"],
-    "new_values": ["0", "1", "2"]
-  },
-  "MENTAL_HEALTH_STATUS": {
-    "old_values": ["1", "2", "3"],
-    "new_values": ["0", "1", "2"]
-  },
-  "SOCIAL_DRINKER": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
-  },
-  "HEAVY_ALCOHOL_CONSUMPTION": {
     "old_values": ["1", "2"],
     "new_values": ["0", "1"]
   },
@@ -39,47 +48,30 @@
     "old_values": ["2", "1"],
     "new_values": ["0", "1"]
   },
-  "SEX": {
-    "old_values": ["2", "1"],
+  "EXERCISE": {
+    "old_values": ["1", "2"],
     "new_values": ["0", "1"]
-  },
-  "BMICAT": {
-    "old_values": ["1", "2", "3", "4"],
-    "new_values": ["0", "1", "2", "3"]
-  },
-  "EDUCATION_LEVEL": {
-    "old_values": ["1", "2", "3", "4"],
-    "new_values": ["0", "1", "2", "3"]
-  },
-  "INCOME": {
-    "old_values": ["1", "2", "3", "4", "5"],
-    "new_values": ["0", "1", "2", "3", "4"]
-  },
-  "AGE_CATEGORIES": {
-    "old_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
-    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-  },
-  "MARITAL_STATUS": {
-    "old_values": ["5", "4", "2", "3", "6", "1"],
-    "new_values": ["0", "1", "2", "3", "4", "5"]
-  },
-  "EMPLOYMENT": {
-    "old_values": ["3", "4", "8", "5", "6", "7", "2", "1"],
-    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7"]
   },
   "SMOKER": {
     "multi_step": true,
     "no_codes": ["3", "4"],
     "yes_codes": ["1", "2"]
   },
-  "DRINKER": {
-    "multi_step": true,
-    "no_codes": ["2"],
-    "yes_codes": ["1"]
+  "HEAVY_ALCOHOL_CONSUMPTION": {
+    "old_values": ["1", "2"],
+    "new_values": ["0", "1"]
   },
-  "DIABETES": {
-    "multi_step": true,
-    "no_codes": ["3", "4"],
-    "yes_codes": ["1", "2"]
+  "HEALTH_STATUS": {
+    "old_values": ["2", "1"],
+    "new_values": ["0", "1"]
+  },
+  "POOR_PHYSICAL_HEALTH_DAYS": {
+    "old_values": ["1", "2", "3"],
+    "new_values": ["0", "1", "2"]
+  },
+  "POOR_MENTAL_HEALTH_DAYS": {
+    "old_values": ["1", "2", "3"],
+    "new_values": ["0", "1", "2"]
   }
+
 }
