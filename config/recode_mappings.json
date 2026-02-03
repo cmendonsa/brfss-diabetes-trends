@@ -1,77 +1,92 @@
 {
   "DIABETES": {
     "multi_step": true,
-    "no_codes": ["3", "4"],
-    "yes_codes": ["1", "2"]
+    "no_codes": [3, 4],
+    "yes_codes": [1, 2],
+    "missing_values": [7, 9]
   },
   "AGE_CATEGORIES": {
-    "old_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
-    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+    "old_values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    "new_values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "missing_values": [14]
   },
   "SEX": {
-    "old_values": ["2", "1"],
-    "new_values": ["0", "1"]
+    "old_values": [2, 1],
+    "new_values": [0, 1],
+    "missing_values": [7, 9]
   },
   "RACE": {
-    "old_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-    "new_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    "old_values": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "new_values": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "missing_values": [9]
   },
   "INCOME": {
-    "old_values": ["1", "2", "3", "4", "5"],
-    "new_values": ["0", "1", "2", "3", "4"]
+    "old_values": [1, 2, 3, 4, 5],
+    "new_values": [0, 1, 2, 3, 4],
+    "missing_values": [9]
   },
   "EDUCATION_LEVEL": {
-    "old_values": ["1", "2", "3", "4"],
-    "new_values": ["0", "1", "2", "3"]
+    "old_values": [1, 2, 3, 4],
+    "new_values": [0, 1, 2, 3],
+    "missing_values": [9]
   },
   "EMPLOYMENT": {
-    "old_values": ["3", "4", "8", "5", "6", "7", "2", "1"],
-    "new_values": ["0", "1", "2", "3", "4", "5", "6", "7"]
+    "old_values": [3, 4, 8, 5, 6, 7, 2, 1],
+    "new_values": [0, 1, 2, 3, 4, 5, 6, 7],
+    "missing_values": [9]
   },
   "MARITAL_STATUS": {
-    "old_values": ["5", "4", "2", "3", "6", "1"],
-    "new_values": ["0", "1", "2", "3", "4", "5"]
+    "old_values": [5, 4, 2, 3, 6, 1],
+    "new_values": [0, 1, 2, 3, 4, 5],
+    "missing_values": [9]
   },
   "HEALTH_CARE_COVERAGE": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
+    "old_values": [1, 2],
+    "new_values": [0, 1],
+    "missing_values": [9]
   },
   "BMICAT": {
-    "old_values": ["1", "2", "3", "4"],
-    "new_values": ["0", "1", "2", "3"]
+    "old_values": [1, 2, 3, 4],
+    "new_values": [0, 1, 2, 3]
   },
   "HEART_ATTACK": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
+    "old_values": [1, 2],
+    "new_values": [0, 1]
   },
   "STROKE": {
-    "old_values": ["2", "1"],
-    "new_values": ["0", "1"]
+    "old_values": [2, 1],
+    "new_values": [0, 1],
+    "missing_values": [7, 9]
   },
   "EXERCISE": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
+    "old_values": [1, 2],
+    "new_values": [0, 1],
+    "missing_values": [7, 9]
   },
   "SMOKER": {
     "multi_step": true,
-    "no_codes": ["3", "4"],
-    "yes_codes": ["1", "2"]
+    "no_codes": [3, 4],
+    "yes_codes": [1, 2],
+    "missing_values": [9]
   },
   "HEAVY_ALCOHOL_CONSUMPTION": {
-    "old_values": ["1", "2"],
-    "new_values": ["0", "1"]
+    "old_values": [1, 2],
+    "new_values": [0, 1],
+    "missing_values": [9]
   },
   "HEALTH_STATUS": {
-    "old_values": ["2", "1"],
-    "new_values": ["0", "1"]
+    "old_values": [2, 1],
+    "new_values": [0, 1],
+    "missing_values": [9]
   },
   "POOR_PHYSICAL_HEALTH_DAYS": {
-    "old_values": ["1", "2", "3"],
-    "new_values": ["0", "1", "2"]
+    "old_values": [1, 2, 3],
+    "new_values": [0, 1, 2],
+    "missing_values": [9]
   },
   "POOR_MENTAL_HEALTH_DAYS": {
-    "old_values": ["1", "2", "3"],
-    "new_values": ["0", "1", "2"]
+    "old_values": [1, 2, 3],
+    "new_values": [0, 1, 2],
+    "missing_values": [9]
   }
-
 }

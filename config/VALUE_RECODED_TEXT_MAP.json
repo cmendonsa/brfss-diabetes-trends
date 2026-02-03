@@ -16,5 +16,5 @@
   "HEAVY_ALCOHOL_CONSUMPTION": {"0": "No", "1": "Yes"},
   "HEALTH_STATUS": {"0": "Poor", "1": "Good"},
   "POOR_PHYSICAL_HEALTH_DAYS": {"0": "Zero days", "1": "1-13 days", "2": "14+ days"},
-  "POOR_MENTAL_HEALTH_DAYS": {"0": "Zero days", "1": "1-13 days", "2": "14+ days"},
+  "POOR_MENTAL_HEALTH_DAYS": {"0": "Zero days", "1": "1-13 days", "2": "14+ days"}
 }
