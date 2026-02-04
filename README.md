@@ -53,8 +53,8 @@ brfss-diabetes-trends/
 │   └── 1_data_download.ipynb      # Main processing pipeline
 ├── config/
 │   ├── VAR_MAP.json               # Variable name mappings (canonical → raw)
-│   ├── VALUE_MAP.json             # Per-year code overrides
-│   └── VALUE_TEXT_MAP.json        # Universal code → label mappings
+│   ├── VALUE_MAP.json             # Per-year code overrides (rarely used)
+│   └── VALUE_RECODED_TEXT_MAP.json # Universal code → label mappings
 ├── data_codebooks/                # CDC official codebook references (HTML)
 │   ├── LLCP 2019_ Codebook Report.html
 │   ├── USCODE22_LLCP_102523.HTML
@@ -220,8 +220,8 @@ The output CSV contains 24 columns: 23 canonical health variables + YEAR. All va
 Variable mappings are managed in JSON configuration files under `config/`:
 
 - **`VAR_MAP.json`**: Maps 23 canonical variable names to year-specific raw XPT column names (handles schema drift across years)
-- **`VALUE_TEXT_MAP.json`**: Universal numeric code → label mappings (e.g., 1="Yes", 2="No", 9="Refused")
-- **`VALUE_MAP.json`**: Year-specific code overrides when a year's encoding differs from the universal mapping
+- **`VALUE_RECODED_TEXT_MAP.json`**: Universal numeric code → label mappings (e.g., 1="Yes", 2="No", 9="Refused")
+- **`VALUE_MAP.json`**: Year-specific code overrides when a year's encoding differs from the universal mapping (rarely needed)
 
 ## Configuration
 
@@ -310,7 +310,7 @@ The `normalize_days()` function converts 2015 format to 2016+ format. Modify thi
 - Missing columns are added as NA (doesn't halt processing)
 - Decoding errors are logged; original values preserved if mapping fails
 
-**Configuration-Driven Design**: All year-specific logic resides in JSON configs (VAR_MAP, VALUE_MAP, VALUE_TEXT_MAP), not hardcoded in functions.
+**Configuration-Driven Design**: All year-specific logic resides in JSON configs (VAR_MAP, VALUE_MAP, VALUE_RECODED_TEXT_MAP), not hardcoded in functions.
 
 ## Contributing
 
