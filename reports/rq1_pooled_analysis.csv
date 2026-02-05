@@ -1,0 +1,2 @@
+Period,Young_N,Young_Diabetic,Young_Prevalence_%,Older_N,Older_Diabetic,Older_Prevalence_%,Z_Statistic,P_Value,Cohens_h,Significant_at_0.05,Effect_Size_Interpretation
+2015-2024 (Pooled),294002,10036,3.413582220529112,2195584,496938,22.633522561651024,-243.0267415430617,0.0,-0.6199733425227725,True,Large
