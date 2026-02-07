@@ -1,7 +1,9 @@
 {
   "DIABETES": {
     "0": "No",
-    "1": "Yes"
+    "1": "Gestational",
+    "2": "PreDiabetes",
+    "3": "Diabetes"
   },
   "AGE_CATEGORIES": {
     "0": "18-24",
@@ -23,14 +25,14 @@
     "1": "Male"
   },
   "RACE": {
-    "1": "White",
-    "2": "Black",
-    "3": "American Indian",
-    "4": "Asian",
-    "5": "Hawaiian",
-    "6": "Other",
-    "7": "Non-Hispanic",
-    "8": "Hispanic"
+    "0": "White",
+    "1": "Black",
+    "2": "American Indian",
+    "3": "Asian",
+    "4": "Hawaiian",
+    "5": "Other",
+    "6": "Non-Hispanic",
+    "7": "Hispanic"
   },
   "INCOME": {
     "0": "< $15000",
@@ -87,7 +89,9 @@
   },
   "SMOKER": {
     "0": "No",
-    "1": "Yes"
+    "1": "Former",
+    "2": "Somedays",
+    "3": "Everyday"
   },
   "HEAVY_ALCOHOL_CONSUMPTION": {
     "0": "No",
