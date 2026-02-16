@@ -1,9 +1,7 @@
 {
   "DIABETES": {
     "0": "No",
-    "1": "Gestational",
-    "2": "PreDiabetes",
-    "3": "Diabetes"
+    "1": "Yes"
   },
   "AGE_CATEGORIES": {
     "0": "18-24",
@@ -22,7 +20,8 @@
   },
   "SEX": {
     "0": "Female",
-    "1": "Male"
+    "1": "Male",
+    "99": "Unknown"
   },
   "RACE": {
     "0": "White",
@@ -39,7 +38,8 @@
     "1": "$15000 - $24999",
     "2": "$25000 - $34999",
     "3": "$35000 - $49999",
-    "4": "> $50000"
+    "4": "> $50000",
+    "99": "Unknown"
   },
   "EDUCATION_LEVEL": {
     "0": "Dropout",
@@ -55,7 +55,8 @@
     "4": "Student",
     "5": "Retired",
     "6": "Self-Employed",
-    "7": "Wages"
+    "7": "Wages",
+    "99": "Unknown"
   },
   "MARITAL_STATUS": {
     "0": "Single",
@@ -67,13 +68,15 @@
   },
   "HEALTH_CARE_COVERAGE": {
     "0": "No",
-    "1": "Yes"
+    "1": "Yes",
+    "99": "Unknown"
   },
   "BMICAT": {
     "0": "Underweight",
     "1": "Normal",
     "2": "Overweight",
-    "3": "Obese"
+    "3": "Obese",
+    "99": "Unknown"
   },
   "HEART_ATTACK": {
     "0": "No",
@@ -95,7 +98,8 @@
   },
   "HEAVY_ALCOHOL_CONSUMPTION": {
     "0": "No",
-    "1": "Yes"
+    "1": "Yes",
+    "99": "Unknown"
   },
   "HEALTH_STATUS": {
     "0": "Poor",
@@ -110,5 +114,34 @@
     "0": "Zero days",
     "1": "1-13 days",
     "2": "14+ days"
+  },
+  "PRE_DIABETES": {
+    "0": "No",
+    "1": "Yes"
+  },
+  "GEST_DIABETES": {
+    "0": "No",
+    "1": "Yes"
+  },
+  "IS_YOUNG_ADULT": {
+    "0": "30+",
+    "1": "18-29"
+  },
+  "PANDEMIC_FLAG": {
+    "0": "Pre-Pandemic",
+    "1": "Pandemic",
+    "2": "Post-Pandemic"
+  },
+  "RISK_OBESITY": {
+    "0": "No",
+    "1": "Yes"
+  },
+  "RISK_INACTIVE": {
+    "0": "No",
+    "1": "Yes"
+  },
+  "RISK_SMOKING": {
+    "0": "No",
+    "1": "Yes"
   }
 }

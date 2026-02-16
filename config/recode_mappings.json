@@ -1,7 +1,7 @@
 {
   "DIABETES": {
     "orig_values": [1, 2, 3, 4],
-    "recoded_values": [3, 1, 0, 2],
+    "recoded_values": [1, 2, 0, 3],
     "missing_values": [7, 9]
   },
   "AGE_CATEGORIES": {
