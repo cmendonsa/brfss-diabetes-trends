@@ -1,3 +1,4 @@
 data_raw/**/*.XPT
 data_raw/**/*.zip
 data_processed/*.csv
+backup/**/*.*
