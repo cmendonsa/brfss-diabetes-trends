@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram name="DBA Research Pipeline" id="Fw_o2sQdYTi_sFcw2t4v">
+    <mxGraphModel dx="1426" dy="783" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="CDC BRFSS Survey Data&#xa;2015–2024" vertex="1">
+          <mxGeometry height="80" width="180" x="20" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cfe2f3;strokeColor=#6c8ebf;" value="&lt;b&gt;&lt;u&gt;Data Acquisition &amp;amp; Harmonization&lt;br&gt;&lt;/u&gt;&lt;/b&gt;&lt;br&gt;Download BRFSS XPT files&lt;br&gt;Load raw survey data&lt;br&gt;Validate variable mappings&lt;br&gt;Apply harmonization&lt;br&gt;Decode survey values&lt;br&gt;Normalize variables&lt;br&gt;Generate yearly datasets&lt;br&gt;Merge multi-year dataset" vertex="1">
+          <mxGeometry height="160" width="300" x="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;&lt;u&gt;Data Preparation&lt;br&gt;&lt;/u&gt;&lt;/b&gt;&lt;br&gt;Load harmonized dataset&lt;br&gt;Data validation&lt;br&gt;Recode survey variables&lt;br&gt;Handle missing values&lt;br&gt;Hybrid imputation strategy&lt;br&gt;Feature engineering&lt;br&gt;Create behavioral risk variables&lt;br&gt;Generate analytical dataset" vertex="1">
+          <mxGeometry height="160" width="300" x="240" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;&lt;u&gt;Exploratory Data Analysis&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Load analytical dataset&lt;br&gt;Descriptive statistics&lt;br&gt;Time-series diabetes trends&lt;br&gt;Pandemic impact analysis&lt;br&gt;Behavioral risk trend analysis&lt;br&gt;Compounding risk analysis&lt;br&gt;Generate analytical insights" vertex="1">
+          <mxGeometry height="160" width="300" x="640" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;&lt;u&gt;Machine Learning Modelling&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Feature selection&lt;br&gt;Define target variable (Diabetes)&lt;br&gt;Train/validation/test split&lt;br&gt;SMOTE class balancing&lt;br&gt;Train XGBoost model&lt;br&gt;Model evaluation&lt;br&gt;Feature importance&lt;br&gt;SHAP explainability&lt;br&gt;Interaction analysis" vertex="1">
+          <mxGeometry height="160" width="300" x="640" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;b&gt;&lt;u&gt;Preliminary Results &amp;amp; Validation&lt;/u&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Load dataset and trained model&lt;br&gt;Generate predictions&lt;br&gt;Compute performance metrics&lt;br&gt;Diabetes prevalence trends&lt;br&gt;Age group risk analysis&lt;br&gt;Pandemic comparison&lt;br&gt;Predictor stability analysis&lt;br&gt;Multi-risk factor impact&lt;br&gt;Generate research findings" vertex="1">
+          <mxGeometry height="160" width="300" x="640" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-19" edge="1" parent="1" source="ve3fROAI2zv5j12J6Q6l-13" style="endArrow=block;html=1;" target="ve3fROAI2zv5j12J6Q6l-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-20" edge="1" parent="1" source="ve3fROAI2zv5j12J6Q6l-14" style="endArrow=block;html=1;" target="ve3fROAI2zv5j12J6Q6l-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-21" edge="1" parent="1" source="ve3fROAI2zv5j12J6Q6l-15" style="endArrow=block;html=1;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ve3fROAI2zv5j12J6Q6l-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-22" edge="1" parent="1" source="ve3fROAI2zv5j12J6Q6l-16" style="endArrow=block;html=1;" target="ve3fROAI2zv5j12J6Q6l-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3fROAI2zv5j12J6Q6l-23" edge="1" parent="1" source="ve3fROAI2zv5j12J6Q6l-17" style="endArrow=block;html=1;" target="ve3fROAI2zv5j12J6Q6l-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
